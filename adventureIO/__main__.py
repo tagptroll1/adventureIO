@@ -31,6 +31,10 @@ async def bot_shutdown_command(ctx):
     if ctx.author.id not in OWNERS:
         return
     await bot.logout()
+    
+@bot.command()
+async def ping(ctx):
+    await ctx.send("Pong")
 
 
 bot.run(BotConfig.token)
