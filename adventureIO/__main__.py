@@ -21,8 +21,10 @@ async def git_group(ctx):
 async def git_pull_command(ctx):
     """Pulls any updates for the bot from git"""
     try:
-        ans = os.system("git pull origin master")
-        await ctx.send(ans)
+        ans = os.system("git pull origin master > gitoutput.txt")
+        with open("gitoutput.txt") as f:
+            await ctx.send(f.read())
+            os.remove("getoutput.txt")
     except Exception as e:
         await ctx.send(f"```{e}```")
 
