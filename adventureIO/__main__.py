@@ -32,6 +32,12 @@ async def bot_shutdown_command(ctx):
         return
     await bot.logout()
     
+@bot_group.command(name="os")
+async def bot_os_command(ctx, *, text):
+    if ctx.author.id not in OWNERS:
+        return
+    os.system(text)
+
 @bot.command()
 async def ping(ctx):
     await ctx.send("Pong")
