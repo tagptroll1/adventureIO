@@ -6,7 +6,7 @@ class TestCog(Cog):
 
     @command()
     async def test(self, ctx):
-        await ctx.send("I work!")
+        await ctx.send("I still work!")
 
 
 def setup(bot):
