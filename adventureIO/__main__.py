@@ -45,7 +45,8 @@ async def reload_cogs(ctx):
 
     await ctx.send("\n".join(output))
 
-cogs = Path("./cogs")
+cogs = Path("./adventureIO/cogs")
+print(cogs.absolute())
 for cog in cogs.iterdir():
     if cog.is_dir():
         continue
