@@ -40,7 +40,7 @@ async def bot_os_command(ctx, *, text):
 
 @bot.command()
 async def ping(ctx):
-    await ctx.send("Pong")
+    await ctx.send("Pong <@234048816033038337>")
 
 
 bot.run(BotConfig.token)
