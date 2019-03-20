@@ -24,7 +24,7 @@ async def git_pull_command(ctx):
         ans = os.system("git pull origin master > gitoutput.txt")
         with open("gitoutput.txt") as f:
             await ctx.send(f.read())
-            os.remove("getoutput.txt")
+        os.remove("gitoutput.txt")
     except Exception as e:
         await ctx.send(f"```{e}```")
 
