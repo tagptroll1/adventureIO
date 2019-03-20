@@ -1,0 +1,8 @@
+bot:
+  token: "<bot token>"
+  client_id: "<client id>"
+  prefix: "."
+
+ids:
+  creator: 188735535169273858
+  benny: 234048816033038337

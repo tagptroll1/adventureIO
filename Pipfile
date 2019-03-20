@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+discord-py = {git = "https://github.com/Rapptz/discord.py.git", ref = "8123d4a", editable = true}
+aiosqlite = "*"
+pyyaml = "*"
+
+[dev-packages]
+"flake8" = ">=3.6"
+"flake8-bugbear" = "*"
+"flake8-import-order" = "*"
+"flake8-tidy-imports" = "*"
+
+[requires]
+python_version = "3.6"
+
+[scripts]
+start = "py -m adventureIO"
+lint = "py -m flake8"
