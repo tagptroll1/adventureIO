@@ -30,3 +30,10 @@ class Bot(metaclass=YAMLGetter):
     token: str
     client_id: str
     prefix: str
+
+
+class IDS(metaclass=YAMLGetter):
+    section = "ids"
+
+    creator: str
+    benny: str

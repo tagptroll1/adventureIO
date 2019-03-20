@@ -1,5 +1,5 @@
-from discord.ext.commands import Bot
+from adventure_bot import AdventureBot
 from constants import bot as BotConfig
 
-bot = Bot(commands_prefix=BotConfig.prefix)
+bot = AdventureBot(commands_prefix=BotConfig.prefix)
 bot.run(BotConfig.token)
