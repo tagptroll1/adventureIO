@@ -39,11 +39,22 @@ async def ping(ctx):
 
 @bot_group.command()
 async def reload_cogs(ctx):
-    output = []
-    for x in bot.cogs.values():
-        output.append(x)
+    temp = []
+    errors = []
 
-    await ctx.send("\n".join(output))
+    for x in bot.extensions:
+        temp.append(x)
+        try:
+            bot.unload_extension(x)
+            bot.load_extension(x)
+        except Exception as e:
+            errors.append(str(e))
+
+    await ctx.send("Done!")
+    if errors:
+        error = "\n".join(errors)
+        await ctx.send(f"```{error}```")
+
 
 cogs = Path("./adventureIO/cogs")
 print(cogs.absolute())
