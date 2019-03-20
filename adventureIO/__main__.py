@@ -40,8 +40,8 @@ async def ping(ctx):
 @bot_group.command()
 async def reload_cogs(ctx):
     output = []
-    for name, cog in bot.cogs:
-        output.append(f"{name}: {cog}")
+    for x in bot.cogs:
+        output.append(x)
 
     await ctx.send("\n".join(output))
 
