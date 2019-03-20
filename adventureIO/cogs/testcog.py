@@ -11,7 +11,11 @@ class TestCog(Cog):
 
     @command()
     async def newstuff(self, ctx):
-        await ctx.send("this is new!")
+        await ctx.send("this is super new")
+
+    @command()
+    async def thisthing(self, ctx):
+        await ctx.send("hello me tho you")
 
 def setup(bot):
     bot.add_cog(TestCog(bot))
