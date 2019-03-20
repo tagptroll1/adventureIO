@@ -39,6 +39,8 @@ async def ping(ctx):
 
 @bot_group.command()
 async def reload_cogs(ctx):
+    if ctx.author.id not in OWNERS:
+        return
     temp = []
     errors = []
 
@@ -56,23 +58,21 @@ async def reload_cogs(ctx):
         await ctx.send(f"```{error}```")
 
 
-cogs = Path("./adventureIO/cogs")
-print(cogs.absolute())
-for cog in cogs.iterdir():
-    if cog.is_dir():
-        continue
-    if cog.suffix == ".py":
-        path = ".".join(cog.with_suffix("").parts)
+@bot_group.command(name="reload")
+async def reload_cog(ctx, *, cog):
+    if not cog.count(".") == 2:
+        if cog.startswith("cogs."):
+            cog = f"adventureIO.{cog}"
+        else:
+            cog = f"adventureIO.cogs.{cog}"
 
-        try:
-            bot.load_extension(path)
-            print(f"Loading... {path:<22} Success!")
-            log.info(f"Loading... {path:<22} Success!")
-        except Exception as e:
-            log.exception(f"\nLoading... {path:<22} Failed!")
-            print("-"*25)
-            print(f"Loading... {path:<22} Failed!")
-            print(e, "\n" , "-"*25, "\n")
+    try:
+        bot.unload_extension(cog)
+        bot.load_extension(cog)
+    except Exception as e:
+        return await ctx.send(f"```{e}```")
+
+    await ctx.send("Done")
 
 
 bot.run(BotConfig.token)
