@@ -9,5 +9,9 @@ class TestCog(Cog):
         await ctx.send("I still still still still work!")
 
 
+    @command()
+    async def newstuff(self, ctx):
+        await ctx.send("this is new!")
+
 def setup(bot):
     bot.add_cog(TestCog(bot))
