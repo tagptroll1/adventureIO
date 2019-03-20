@@ -1,5 +1,6 @@
 import logging
 import os
+from pathlib import Path
 
 from .adventure_bot import AdventureBot
 from .constants import Bot as BotConfig, IDS
@@ -35,6 +36,31 @@ async def bot_shutdown_command(ctx):
 @bot.command()
 async def ping(ctx):
     await ctx.send("Pong <@234048816033038337>")
+
+@bot_group.command()
+async def reload_cogs(ctx):
+    output = []
+    for name, cog in bot.cogs:
+        output.append(f"{name}: {cog}")
+
+    await ctx.send("\n".join(output))
+
+cogs = Path("./cogs")
+for cog in cogs.iterdir():
+    if cog.is_dir():
+        continue
+    if cog.suffix == ".py":
+        path = ".".join(cog.with_suffix("").parts)
+
+        try:
+            bot.load_extension(path)
+            print(f"Loading... {path:<22} Success!")
+            log.info(f"Loading... {path:<22} Success!")
+        except Exception as e:
+            log.exception(f"\nLoading... {path:<22} Failed!")
+            print("-"*25)
+            print(f"Loading... {path:<22} Failed!")
+            print(e, "\n" , "-"*25, "\n")
 
 
 bot.run(BotConfig.token)
