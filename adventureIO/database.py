@@ -1,5 +1,5 @@
 import aiosqlite as asql
-import sqlite as sql
+import sqlite3 as sql
 
 
 async def setup_tables(items=True):
@@ -13,7 +13,7 @@ async def setup_tables(items=True):
                     weight INT DEFAULT 0,
                     rarity INT DEFAULT 1,
                     use_value INT DEFAULT 0,
-                    usa_value2 INT DEFAULT 0
+                    use_value2 INT DEFAULT 0
                 );
             """
         )
@@ -21,6 +21,17 @@ async def setup_tables(items=True):
         async with asql.connect("adventuredb.db") as db:
             await db.execute(SQL)
             await db.commit()
+
+
+async def check_item_exists(name):
+    async with asql.connect("adventuredb.db") as db:
+        async with db.execute(
+            "SELECT * FROM items WHERE name=?;", (name,)) as curs:
+            result = await curs.fetchone()
+
+    if result:
+        return result
+    return False
 
 
 async def add_item(
@@ -60,16 +71,11 @@ async def add_item(
             SQL += ", use_value"
             values.append(use2)
 
-    SQL += f") VALUES ({'%'*len(values)});"
+    SQL += f") VALUES (?{', ?'*(len(values)-1)});"
 
     async with asql.connect("adventuredb.db") as db:
         await db.execute(SQL, values)
         await db.commit()
 
 
-class SQLGetter(type):
-    def __getattr__(cls, name):
-        SQL = f"SELECT * FROM {cls.table} WHERE id=%s"
 
-    def __getitem__(cls, name):
-        cls.__getattr__(name)
