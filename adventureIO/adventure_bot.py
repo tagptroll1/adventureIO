@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 
+from .database import setup_tables
 from discord.ext.commands import Bot, command, group, is_owner
 
 log = logging.getLogger(__name__)
@@ -10,6 +11,7 @@ class AdventureBot(Bot):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.load_extensions()
+        self.loop.create_task(setup_tables())
 
     async def on_message(self, message):
         print(message.content)

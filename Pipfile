@@ -4,19 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-discord-py = {git = "https://github.com/Rapptz/discord.py.git", ref = "8123d4a", editable = true}
 aiosqlite = "*"
-pyyaml = "*"
-
-[dev-packages]
-"flake8" = ">=3.6"
-"flake8-bugbear" = "*"
-"flake8-import-order" = "*"
-"flake8-tidy-imports" = "*"
+pyyaml = {git = "https://github.com/yaml/pyyaml.git", editable=true}
+discord-py = {git = "https://github.com/Rapptz/discord.py.git", ref = "d48a424f6f464044a59275d5e885b493a4a1aef7", editable = true}
 
 [requires]
-python_version = "3.6"
+python_version = "3.7"
 
 [scripts]
-start = "py -m adventureIO"
-lint = "py -m flake8"
+start = "python -m adventureIO"
