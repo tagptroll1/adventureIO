@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 
 from .database import setup_tables
-from discord.ext.commands import Bot, command, group, is_owner
+from discord.ext.commands import Bot
 
 log = logging.getLogger(__name__)
 
@@ -31,6 +31,6 @@ class AdventureBot(Bot):
                     self.load_extension(path)
                     print(f"Loading... {path:<22} Success!")
                     log.info(f"Loading... {path:<22} Success!")
-                except Exception as e:
+                except Exception:
                     log.exception(f"\nLoading... {path:<22} Failed!")
                     print(f"Loading... {path:<22} Failed!")

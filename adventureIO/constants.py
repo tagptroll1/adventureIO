@@ -24,6 +24,7 @@ class YAMLGetter(type):
     def __getitem__(cls, name):
         return cls.__getattr__(name)
 
+
 class Bot(metaclass=YAMLGetter):
     section = "bot"
 

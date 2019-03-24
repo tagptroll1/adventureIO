@@ -1,9 +1,8 @@
 import logging
 import os
-from pathlib import Path
 
-from .adventure_bot import AdventureBot
-from .constants import Bot as BotConfig, IDS
+from adventureIO.adventure_bot import AdventureBot
+from adventureIO.constants import Bot as BotConfig, IDS
 
 
 OWNERS = (IDS.creator, IDS.benny)
@@ -21,7 +20,7 @@ async def git_group(ctx):
 async def git_pull_command(ctx):
     """Pulls any updates for the bot from git"""
     try:
-        ans = os.system("git pull origin master > gitoutput.txt")
+        os.system("git pull origin master > gitoutput.txt")
         with open("gitoutput.txt") as f:
             await ctx.send(f.read())
         os.remove("gitoutput.txt")
@@ -36,6 +35,8 @@ async def bot_group(ctx):
 
 @bot_group.command(name="shutdown", aliases=("exit", "kill"))
 async def bot_shutdown_command(ctx):
+    """Logs the bot out, this kills the process"""
+    
     if ctx.author.id not in OWNERS:
         return
     await bot.logout()
@@ -43,11 +44,20 @@ async def bot_shutdown_command(ctx):
 
 @bot.command()
 async def ping(ctx):
+    """Pong"""
+
     await ctx.send("Pong <@234048816033038337>")
 
 
 @bot_group.command()
 async def reload_cogs(ctx):
+    """
+    Utility command to reload every cog the bot has loaded.
+
+    This recreates all the class instances of the cogs,
+    which in turn call the __init__ again for all of them.
+    """
+
     if ctx.author.id not in OWNERS:
         return
     temp = []
@@ -69,6 +79,13 @@ async def reload_cogs(ctx):
 
 @bot_group.command(name="reload")
 async def reload_cog(ctx, *, cog):
+    """
+    Utility command to unload and load a cog.
+
+    This recreates the class instance and reloads the __init__ call
+    :param cog: Name of the cog to be reloaded.
+    """
+
     if not cog.count(".") == 2:
         if cog.startswith("cogs."):
             cog = f"adventureIO.{cog}"
