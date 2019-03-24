@@ -3,3 +3,8 @@ adventureIO/__pycache__/*
 config.yml
 Pipfile.lock
 .vscode
+.idea
+*/__pycache__/*
+*.db
+advetureIO/cogs/__pycache__
+*.pyc
