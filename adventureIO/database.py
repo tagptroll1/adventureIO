@@ -6,7 +6,7 @@ import collections
 async def setup_tables(
     items=True,
     inventories=True,
-    adventures=True,
+    adventures=False,
     players=True
 ):
     if items:
@@ -28,14 +28,13 @@ async def setup_tables(
             await db.execute(SQL)
             await db.commit()
 
-    if inventories:
+    if adventures:
         # adventureid is the id of the user holding it
         SQL = (
             """
                 CREATE TABLE IF NOT EXISTS adventures(
                     adventureid BIGINT PRIMARY KEY,
-                    monsterid INTEGER,
-
+                    monsterid INTEGER
                 );
             """
         )
@@ -43,12 +42,12 @@ async def setup_tables(
             await db.execute(SQL)
             await db.commit()
 
-    if adventures:
+    if inventories:
         # Inventoryid is the id of the user holding it
         SQL = (
             """
                 CREATE TABLE IF NOT EXISTS inventories(
-                    inventoryid BIGINT PRIMARY KEY,
+                    inventoryid BIGINT,
                     itemid INTEGER NOT NULL,
                     FOREIGN KEY(itemid)
                         REFERENCES items(itemid)
@@ -90,6 +89,21 @@ async def check_item_exists(name):
     if result:
         return result
     return False
+
+
+async def delete_by_id(_id, table):
+    id_column = table[:-1]+"id"
+    SQL = f"DELETE FROM {table} where {id_column}=?"
+    async with asql.connect("adventuredb.db") as db:
+        await db.execute(SQL, (_id,))
+        await db.commit()
+
+
+async def delete_by_name(name, table):
+    SQL = f"DELETE FROM {table} where name=?"
+    async with asql.connect("adventuredb.db") as db:
+        await db.execute(SQL, (name,))
+        await db.commit()
 
 
 async def add_item(
@@ -174,6 +188,7 @@ class AllItems:
                 raise StopAsyncIteration
 
         return self.buffer.popleft()
+
 
 class AllPlayers:
     def __init__(self):
