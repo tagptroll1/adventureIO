@@ -2,7 +2,7 @@ import logging
 import os
 
 from adventureIO.adventure_bot import AdventureBot
-from adventureIO.constants import Bot as BotConfig, IDS
+from adventureIO.constants import Bot as BotConfig, IDS, Originator
 
 
 OWNERS = (*IDS.creator, IDS.benny)
@@ -48,6 +48,10 @@ async def ping(ctx):
     """Pong"""
 
     await ctx.send("Pong <@234048816033038337>")
+
+@bot.command()
+async def originator(ctx):
+    await ctx.send(Originator.origiator)
 
 
 @bot_group.command()
