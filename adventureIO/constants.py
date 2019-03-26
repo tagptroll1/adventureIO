@@ -33,6 +33,7 @@ class Bot(metaclass=YAMLGetter):
     client_id: str
     prefix: str
 
+
 class IDS(metaclass=YAMLGetter):
     section = "ids"
 
