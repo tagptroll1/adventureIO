@@ -41,4 +41,5 @@ class IDS(metaclass=YAMLGetter):
 
 class Originator(metaclass=YAMLGetter):
     section = "originator"
-    origiator: str
+    
+    name: str

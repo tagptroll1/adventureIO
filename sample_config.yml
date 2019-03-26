@@ -9,4 +9,5 @@ ids:
       - 232971316880343051
     benny: 234048816033038337
 
-originator: "<name (nick or some identifying name)>"
+originator: 
+    name: "<name (nick or some identifying name)>"

@@ -49,9 +49,11 @@ async def ping(ctx):
 
     await ctx.send("Pong <@234048816033038337>")
 
-@bot.command()
+@bot_group.command(name="originator")
 async def originator(ctx):
-    await ctx.send(Originator.origiator)
+    await ctx.send(Originator.name)
+
+    
 
 
 @bot_group.command()
