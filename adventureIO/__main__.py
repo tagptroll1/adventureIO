@@ -5,7 +5,7 @@ from adventureIO.adventure_bot import AdventureBot
 from adventureIO.constants import Bot as BotConfig, IDS
 
 
-OWNERS = (IDS.creator, IDS.benny)
+OWNERS = (*IDS.creator, IDS.benny)
 
 log = logging.getLogger(__name__)
 bot = AdventureBot(command_prefix=BotConfig.prefix)
@@ -39,6 +39,7 @@ async def bot_shutdown_command(ctx):
     
     if ctx.author.id not in OWNERS:
         return
+    await ctx.send("shutting down...")
     await bot.logout()
 
 
