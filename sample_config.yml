@@ -4,7 +4,12 @@ bot:
     prefix: "."
 
 ids:
-    creators:
-        - 188735535169273858
-        - 232971316880343051
+    creators: 
+      - 188735535169273858
+      - 232971316880343051
     benny: 234048816033038337
+
+originator: 
+    name: "<name (nick or some identifying name)>"
+
+
