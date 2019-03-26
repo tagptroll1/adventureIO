@@ -93,16 +93,41 @@ async def check_item_exists(name):
 
 async def delete_by_id(_id, table):
     id_column = table[:-1]+"id"
-    SQL = f"DELETE FROM {table} where {id_column}=?"
+    SQL = f"DELETE FROM {table} where {id_column}=?;"
     async with asql.connect("adventuredb.db") as db:
         await db.execute(SQL, (_id,))
         await db.commit()
 
 
 async def delete_by_name(name, table):
-    SQL = f"DELETE FROM {table} where name=?"
+    SQL = f"DELETE FROM {table} where name=?;"
     async with asql.connect("adventuredb.db") as db:
         await db.execute(SQL, (name,))
+        await db.commit()
+
+
+async def delete_many_by_id(ids, table):
+    assert isinstance(ids, (list, tuple, set))
+
+    ids = [(id_,) for id_ in ids]
+
+    id_column = table[:-1] + "id"
+    SQL = f"DELETE FROM {table} where {id_column}=?;"
+
+    async with asql.connect("adventuredb.db") as db:
+        await db.executemany(SQL, ids)
+        await db.commit()
+
+
+async def delete_many_by_name(names, table):
+    assert isinstance(names, (list, tuple, set))
+
+    names = [(name,) for name in names]
+
+    SQL = f"DELETE FROM {table} where name=?;"
+
+    async with asql.connect("adventuredb.db") as db:
+        await db.executemany(SQL, names)
         await db.commit()
 
 
@@ -120,35 +145,35 @@ async def add_item(
 
     if _id:
         SQL += "id, name"
-        values = [_id, name]
+        values = [int(_id), name]
     else:
         SQL += "name"
         values = [name]
 
     if price:
         SQL += ", price"
-        values.append(price)
+        values.append(int(price))
 
     if weight:
         SQL += ", weight"
-        values.append(weight)
+        values.append(int(weight))
 
     if rarity:
         SQL += ", rarity"
-        values.append(rarity)
+        values.append(int(rarity))
 
     if use1:
         SQL += ", use_value"
-        values.append(use1)
+        values.append(int(use1))
 
         if use2:
             SQL += ", use_value2"
-            values.append(use2)
+            values.append(int(use2))
 
     else:
         if use2:
             SQL += ", use_value"
-            values.append(use2)
+            values.append(int(use2))
 
     SQL += ", shop"
     values.append(shop)

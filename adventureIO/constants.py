@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+from typing import List
 
 import yaml
 
@@ -36,5 +37,5 @@ class Bot(metaclass=YAMLGetter):
 class IDS(metaclass=YAMLGetter):
     section = "ids"
 
-    creator: str
-    benny: str
+    creators: List[int]
+    benny: int
