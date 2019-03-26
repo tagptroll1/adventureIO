@@ -7,6 +7,7 @@ from adventureIO.constants import Bot as BotConfig, IDS, Originator
 
 OWNERS = (*IDS.creator, IDS.benny)
 
+
 log = logging.getLogger(__name__)
 bot = AdventureBot(command_prefix=BotConfig.prefix)
 

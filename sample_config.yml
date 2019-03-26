@@ -1,7 +1,7 @@
 bot:
-  token: "<bot token>"
-  client_id: "<client id>"
-  prefix: "."
+    token: "<bot token>"
+    client_id: "<client id>"
+    prefix: "."
 
 ids:
     creator: 
@@ -11,3 +11,5 @@ ids:
 
 originator: 
     name: "<name (nick or some identifying name)>"
+
+
