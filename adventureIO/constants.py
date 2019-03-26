@@ -39,3 +39,10 @@ class IDS(metaclass=YAMLGetter):
 
     creators: List[int]
     benny: int
+
+
+class Originator(metaclass=YAMLGetter):
+    section = "originator"
+    
+    name: str
+
