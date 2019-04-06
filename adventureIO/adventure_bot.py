@@ -14,7 +14,6 @@ class AdventureBot(Bot):
         self.loop.create_task(setup_tables())
 
     async def on_message(self, message):
-        print(message.content)
 
         await self.process_commands(message)
 
