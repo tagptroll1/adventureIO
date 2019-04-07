@@ -9,15 +9,17 @@ class Player:
         self.display_name = member.display_name
         self.activated = False
 
-        if self.id in players:
-            player = players[self.id]
-
-            self.health = player["max_hp"]
-            self.max_health = player["max_hp"]
-            self.attack = player["atk"]
-            self.resistance = player["res"]
-            self.crit = player["crit"]
-            self.activated = True
+    @classmethod
+    def from_database(cls, member, stats):
+        hp, max_hp, atk, res, crit, activ = stats
+        player = cls(member)
+        player.health = hp
+        player.max_health = max_hp
+        player.attack = atk
+        player.resistance = res
+        player.crit = crit
+        player.activated = activ
+        return player
 
     def __getattribute__(self, name):
         activated_attributes = (

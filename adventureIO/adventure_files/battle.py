@@ -38,10 +38,9 @@ TEMP_MONSTER_STATS = {
 
 
 class Battle:
-    def __init__(self, player, ctx):
+    def __init__(self, player, enemy=None):
         self.player = player
-        self.ctx = ctx
-        self.enemy = None
+        self.enemy = enemy
 
     async def setup(self):
         # TODO: Enemy from db
@@ -79,7 +78,7 @@ class Battle:
 
         return dmg * dice, crit
 
-    async def step(self):
+    async def step(self, channel):
         print("Step called")
         monster = self.enemy
         m_dmg, m_crit = self.get_damage(monster)
@@ -97,7 +96,7 @@ class Battle:
         }
 
         if monster.health <= 0:
-            return await self.monster_died(report)
+            return await self.monster_died(channel, report)
 
         player.health -= m_dmg
 
@@ -105,9 +104,9 @@ class Battle:
         report["monster_crit"] = m_crit
         report["player_hp"] = player.health
 
-        return await self.print_battlestatus(report)
+        return await self.print_battlestatus(channel, report)
 
-    async def monster_died(self, report):
+    async def monster_died(self, channel, report):
         monster = self.enemy
         name = self.player.display_name
 
@@ -116,7 +115,7 @@ class Battle:
         else:
             crit = ""
 
-        await self.ctx.send(
+        await channel.send(
             f"{name} hit {monster.name} {crit} for {report['player_dmg']}\n"
             f"{monster.name} was slain! \n"
             f"{name} has "
@@ -125,15 +124,15 @@ class Battle:
         self.enemy = None
         return report["player_hp"]
 
-    async def player_died(self, report):
+    async def player_died(self, channel, report):
         monster = self.enemy
-        await self.ctx.send(
+        await channel.send(
             f"{self.player.display_name} was slain by "
             f"{monster.name}.\n"
         )
         return 0
 
-    async def print_battlestatus(self, report):
+    async def print_battlestatus(self, channel, report):
         monster = self.enemy
         name = self.player.display_name
         m_dmg = report["monster_dmg"]
@@ -161,8 +160,8 @@ class Battle:
                 f"\n{name} has "
                 f"{report['player_hp']}/{self.player.max_hp} hp left."
             )
-            await self.ctx.send(response)
+            await channel.send(response)
             return self.player.hp
         else:
-            await self.ctx.send(response)
-            return await self.player_died(report)
+            await channel.send(response)
+            return await self.player_died(channel, report)

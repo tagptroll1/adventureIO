@@ -15,11 +15,24 @@ class AdventureCog(Cog):
         self.active_players = {}
         self.queue = []
 
-        # bot.loop.create_task(self.sync_adventures())
+        # bot.loop.create_task(self.async__init__())
 
-    async def sync_adventures(self):
+    async def async__init__(self):
         ...
-        # adventurers = await database.get_adventurers()
+        # async for adventure in database.get_adventurers():
+        #   player = self.bot.get_user(adventure["player_id"])
+        #   type = adventure["type"]
+        #   running = adventure["running"]
+        #   enemy_tuple = await database.get_active_mob(adventure["enemy_id"])
+        #   enemy_params = ("id", "name", "desc", "hp", "atk", "res", "crit", "loot", "max_hp")
+        #   enemy_dict = dict(zip(enemy_params, enemy_tuple))
+        #   enemy = Enemy(**enemy_dict)
+        #   instance = Battle(player, enemy)
+        #   adventure = Adventure(player, type, running, instance)
+        #   self.active_adventures[player.id] = adventure
+        #   self.active_players[player.id] = player
+        #   await self.update_player_queue(player.id)
+        # print("Loaded", len(self.queue), "adventures")
 
     async def ensure_save(self, player_id):
         print("Totally saved", player_id)
