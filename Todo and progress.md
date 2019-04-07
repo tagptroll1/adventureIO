@@ -19,4 +19,3 @@
   * AsyncIterator() -> dict("players_id": int, "type": str, "running": bool", "enemy_id": int, "max_hp": int)
 
 - [ ] add_player(member_id: int, hp: int, max_hp: int, atk: int, res: int, crit: int, activated:bool)
-
