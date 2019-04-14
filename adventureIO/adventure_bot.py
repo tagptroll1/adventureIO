@@ -14,7 +14,6 @@ class AdventureBot(Bot):
         self.load_extensions()
 
     async def on_message(self, message):
-        print(message.content)
 
         await self.process_commands(message)
 
