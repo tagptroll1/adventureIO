@@ -43,6 +43,14 @@ class IDS(metaclass=YAMLGetter):
 
 class Originator(metaclass=YAMLGetter):
     section = "originator"
-    
+
     name: str
 
+
+class Database(metaclass=YAMLGetter):
+    section = "database"
+
+    user: str
+    password: str
+    database: str
+    host: str

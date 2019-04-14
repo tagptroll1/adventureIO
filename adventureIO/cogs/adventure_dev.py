@@ -21,7 +21,7 @@ class AdventureDevelopmentCog(Cog):
 
     @developer_add_group.command(name="item")
     async def add_item_to_database(self, ctx, *, name):
-        item = await database.check_item_exists(name)
+        item = await database.check_item_exists(self.bot.pool, name)
         if item:
             return await ctx.send(f"This item already exists: {item}")
 
@@ -67,7 +67,7 @@ class AdventureDevelopmentCog(Cog):
                 kwargs[key] = value
 
         print(kwargs)
-        await database.add_item(**kwargs)
+        await database.add_item(self.bot.pool, **kwargs)
         await ctx.send("Done")
 
     @developer_remove_group.command(name="item")
@@ -79,9 +79,9 @@ class AdventureDevelopmentCog(Cog):
             _int = False
 
         if _int:
-            await database.delete_by_id(item, 'items')
+            await database.delete_by_id(self.bot.pool, item, 'item')
         else:
-            await database.delete_by_name(item, 'items')
+            await database.delete_by_name(self.bot.pool, item, 'item')
 
         await ctx.send("Done")
 
@@ -95,10 +95,10 @@ class AdventureDevelopmentCog(Cog):
 
         if all_int:
             int_items = [int(item) for item in items]
-            await database.delete_many_by_id(int_items, "items")
+            await database.delete_many_by_id(self.bot.pool, int_items, "item")
 
         else:
-            await database.delete_many_by_name(items, "items")
+            await database.delete_many_by_name(self.bot.pool, items, "item")
 
         await ctx.send("Done")
 
@@ -128,8 +128,9 @@ class AdventureDevelopmentCog(Cog):
                 f"{'-'*11}+"
             )
         ]
-        async for item in database.AllItems():
-            _id, name, price, weight, rarity, use1, use2, shop = item
+        async for item in database.AllItems(self.bot.pool):
+            print(item)
+            _id, name, price, weight, rarity, use1, use2, shop, invid = item
             _id = str(_id)
             price = str(price)
             weight = str(weight)

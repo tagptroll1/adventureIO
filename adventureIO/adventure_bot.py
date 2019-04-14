@@ -1,17 +1,17 @@
 import logging
 from pathlib import Path
 
-from .database import setup_tables
 from discord.ext.commands import Bot
+
 
 log = logging.getLogger(__name__)
 
 
 class AdventureBot(Bot):
-    def __init__(self, **kwargs):
+    def __init__(self, pool=None, **kwargs):
         super().__init__(**kwargs)
+        self.pool = pool
         self.load_extensions()
-        self.loop.create_task(setup_tables())
 
     async def on_message(self, message):
         print(message.content)
