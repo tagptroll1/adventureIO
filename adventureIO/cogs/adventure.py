@@ -1,11 +1,8 @@
-import asyncio
-import random
-
 from discord.ext.commands import Cog, command, group
 
+from adventureIO import database
 from ..adventure_files.adventure import Adventure
 from ..adventure_files.player import Player
-from ..adventure_files.players import players
 
 
 class AdventureCog(Cog):
@@ -24,7 +21,10 @@ class AdventureCog(Cog):
         #   type = adventure["type"]
         #   running = adventure["running"]
         #   enemy_tuple = await database.get_active_mob(adventure["enemy_id"])
-        #   enemy_params = ("id", "name", "desc", "hp", "atk", "res", "crit", "loot", "max_hp")
+        #   enemy_params = (
+        #       "id", "name", "desc", "hp", "atk",
+        #       "res", "crit", "loot", "max_hp",
+        #   )
         #   enemy_dict = dict(zip(enemy_params, enemy_tuple))
         #   enemy = Enemy(**enemy_dict)
         #   instance = Battle(player, enemy)
@@ -105,31 +105,29 @@ class AdventureCog(Cog):
 
     @command(name="create")
     async def create_player_command(self, ctx):
-        if ctx.author.id in players:
-            return await ctx.send("You already have an account")
-
-        default_stats = {
-            "id": ctx.author.id,
+        package = {
+            "playerid": ctx.author.id,
             "name": ctx.author.display_name,
-            "max_hp": 30,
-            "atk": 5,
-            "res": 5,
-            "crit": 1,
-            "skillpoints": 5,
-            "level": 1,
-            "xp": 0,
         }
 
-        if ctx.author.id not in self.active_players:
-            player = Player(ctx.author)
-            self.active_players[ctx.author.id] = player
-            await self.update_player_queue(ctx.author.id)
+        player = await database.insert_player(self.bot.pool, package)
 
-        player = self.active_players[ctx.author.id]
-        player.activate(30, 5, 5, 1)
-        players[ctx.author.id] = default_stats
+        if player:
+            if not player["activated"]:
+                return await ctx.send(
+                    f"{ctx.author.mention} already have an account, "
+                    "but is not activated!\n"
+                    f"{ctx.prefix}activate to activate your account."
+                )
+            return await ctx.send(
+                f"{ctx.author.mention} "
+                "already have an account!"
+            )
 
-        await ctx.send(f"created! {default_stats}")
+        await ctx.send(
+            f"Created account, don't forget to activate it with "
+            f"{ctx.prefix}activate!"
+        )
 
 
 def setup(bot):

@@ -3,7 +3,7 @@ import logging
 
 from adventureIO.adventure_bot import AdventureBot
 from adventureIO.constants import Bot as BotConfig
-import adventureIO.database as database
+from adventureIO import database
 
 
 log = logging.getLogger(__name__)
@@ -12,6 +12,7 @@ log = logging.getLogger(__name__)
 async def start_bot():
     pool = await database.get_pool()
     bot = AdventureBot(pool=pool, command_prefix=BotConfig.prefix)
+    await database.setup_tables(bot)
     await bot.start(BotConfig.token)
 
 

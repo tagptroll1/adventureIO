@@ -23,8 +23,8 @@ async def get_pool():
         database=path,
         host=host,
         port=port,
-        min_size=4,
-        max_size=4
+        min_size=3,
+        max_size=3
     )
     return pool
 
@@ -48,10 +48,17 @@ async def setup_tables(
                 CREATE TABLE IF NOT EXISTS player(
                     playerid BIGINT PRIMARY KEY,
                     name TEXT NOT NULL,
+                    hp INTEGER DEFAULT 30,
+                    maxhp INTEGER DEFAULT 30,
+                    atk INTEGER DEFAULT 5,
+                    res INTEGER DEFAULT 5,
+                    crit INTEGER DEFAULT 1,
+                    skillpoints INTEGER DEFAULT 5,
                     level INTEGER DEFAULT 1,
+                    xp INTEGER DEFAULT 0,
                     money INTEGER DEFAULT 0,
-                    inventoryid int,
-                    adventureid int
+                    activated BOOLEAN DEFAULT FALSE,
+                    adventureid BIGINT DEFAULT NULL
                 );
             """
         )
@@ -104,6 +111,38 @@ async def setup_tables(
 
         async with pool.acquire() as conn:
             await conn.execute(SQL)
+
+
+async def get_player(pool, id_, conn=None):
+    SQL = "SELECT * FROM player WHERE playerid = $1"
+
+    if conn:
+        result = await conn.fetchrow(SQL, id_)
+    else:
+        async with pool.acquire() as conn:
+            result = await conn.fetchrow(SQL, id_)
+
+    return result
+
+
+async def insert_player(pool, stats):
+    # TODO: Look into if we can avoid having multiple queries
+    async with pool.acquire() as conn:
+        result = await get_player(pool, stats["playerid"], conn)
+        if result:
+            return result
+
+        SQL = (
+            """
+            INSERT INTO player(
+                playerid, name
+            ) VALUES ($1, $2);
+            """
+        )
+        await conn.execute(
+            SQL, stats["playerid"], stats["name"]
+            )
+        return False  # return result above has a True-ish value
 
 
 async def check_item_exists(pool, name):

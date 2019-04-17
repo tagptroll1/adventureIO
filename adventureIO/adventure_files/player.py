@@ -1,4 +1,8 @@
-from .players import players
+# import adventureIO.database as database
+
+
+class PlayerNotActivatedError(Exception):
+    ...
 
 
 class Player:
@@ -11,13 +15,22 @@ class Player:
 
     @classmethod
     def from_database(cls, member, stats):
-        hp, max_hp, atk, res, crit, activ = stats
+        (
+            _, _, hp, max_hp,
+            atk, res, crit, skillpoints,
+            level, xp, money, activ,
+        ) = stats
+
         player = cls(member)
         player.health = hp
         player.max_health = max_hp
         player.attack = atk
         player.resistance = res
         player.crit = crit
+        player.skillpoints = skillpoints
+        player.level = level
+        player.xp = xp
+        player.money = money
         player.activated = activ
         return player
 
@@ -57,16 +70,12 @@ class Player:
     def res(self):
         return self.resistance
 
-    def activate(self, *stats):
-        hp, atk, res, crit = stats
+    async def activate(self, ctx):
+        if self.activated:
+            return await ctx.send("You're already activated!")
 
-        self.health = hp
-        self.max_health = hp
-        self.attack = atk
-        self.resistance = res
-        self.crit = crit
-
-        self.activated = True
+        # TODO: Start session to add skillpoints to player
+        # self.activated = True
 
     def revive(self):
         self.health = self.max_health
