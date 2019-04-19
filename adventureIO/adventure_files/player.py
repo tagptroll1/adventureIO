@@ -14,11 +14,11 @@ class Player:
         self.activated = False
 
     @classmethod
-    def from_database(cls, member, stats):
+    def from_database(cls, member, row):
         (
             _, _, hp, max_hp,
             atk, res, crit, skillpoints,
-            level, xp, money, activ,
+            level, xp, money, activ, adventure_id
         ) = stats
 
         player = cls(member)
@@ -32,6 +32,7 @@ class Player:
         player.xp = xp
         player.money = money
         player.activated = activ
+        player.adventure_id = adventure_id
         return player
 
     def __getattribute__(self, name):

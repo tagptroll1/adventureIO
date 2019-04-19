@@ -54,3 +54,4 @@ class Database(metaclass=YAMLGetter):
     password: str
     database: str
     host: str
+    port: int

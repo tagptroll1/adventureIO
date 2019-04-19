@@ -1,28 +1,13 @@
 
 import asyncpg
 import collections
-import urllib.parse as up
 
 from adventureIO.constants import Database
-# import sqlite3 as sql
-
-up.uses_netloc.append("postgres")
-url = up.urlparse(Database.url)
-
-path = url.path[1:]
-user = url.username
-password = url.password
-host = url.hostname
-port = url.port
 
 
 async def get_pool():
     pool = await asyncpg.create_pool(
-        user=user,
-        password=password,
-        database=path,
-        host=host,
-        port=port,
+        Database.url,
         min_size=3,
         max_size=3
     )
@@ -113,8 +98,8 @@ async def setup_tables(
             await conn.execute(SQL)
 
 
-async def get_player(pool, id_, conn=None):
-    SQL = "SELECT * FROM player WHERE playerid = $1"
+async def fetch_player(pool, id_, conn=None):
+    SQL = "SELECT * FROM player WHERE playerid = $1;"
 
     if conn:
         result = await conn.fetchrow(SQL, id_)
@@ -128,7 +113,7 @@ async def get_player(pool, id_, conn=None):
 async def insert_player(pool, stats):
     # TODO: Look into if we can avoid having multiple queries
     async with pool.acquire() as conn:
-        result = await get_player(pool, stats["playerid"], conn)
+        result = await fetch_player(pool, stats["playerid"], conn)
         if result:
             return result
 

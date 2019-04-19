@@ -102,8 +102,24 @@ class AdventureDevelopmentCog(Cog):
 
         await ctx.send("Done")
 
-    @developer_group.command(name="get")
+    @developer_group.group(name="get")
     async def developer_get_group(self, ctx):
+        ...
+
+    @developer_get_group.command(name="player", aliases=["players", "p"])
+    async def dev_get_players_command(self, ctx):
+        players = [
+            ", ".join(str(col) for col in player) 
+            async for player 
+            in database.AllPlayers(self.bot.pool)
+        ]
+
+        codeblock = "```{}```"
+        await ctx.send(codeblock.format("\n".join(players)))
+        
+
+    @developer_get_group.command(name="item", aliases=["items", "i"])
+    async def dev_get_items_command(self, ctx):
         rarity_map = {
             "1": ("|", "|"),
             "2": (r'"', r'"'),
@@ -121,7 +137,7 @@ class AdventureDevelopmentCog(Cog):
         all_items = [
             (
                 f"|{'Id':^4}|{'Name':^26}|{'Price':^7}|"
-                f"{'Weight':^8}|{'Rarirty':^11}|"
+                f"{'Weight':^8}|{'Rarity':^11}|"
             ),
             (
                 f"+{'-'*4}+{'-'*26}+{'-'*7}+{'-'*8}+"
@@ -142,7 +158,7 @@ class AdventureDevelopmentCog(Cog):
             _str = (
                 f"{prefix}"
                 f"{_id[:4]:^4}|{name[:26]:^26}|{price[:7]:^7}|"
-                f"{weight[:8]:^8}|{rarity[:9]:^11}"
+                f"{weight[:8]:^8}|{rarity[:9]:^10}"
                 f"{suffix}"
             )
             all_items.append(_str)

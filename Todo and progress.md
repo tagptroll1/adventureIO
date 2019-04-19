@@ -19,4 +19,10 @@
     -   AsyncIterator() -> dict("players_id": int, "type": str, "running": bool", "enemy_id": int, "max_hp": int)
 
 -   [x] add_player(member_id: int, hp: int, max_hp: int, atk: int, res: int, crit: int, activated:bool)
-    -   Modified to insert_player(pool, stats).
+    -   Modified to insert_player(pool, stats)
+    -   [x] push player to database
+    -   [ ] activate players
+        -   [ ] Inform player how to add skillpoints and how to get help.
+    -   [x] display all players
+    -   [ ] search players
+-   [x] fetch_player(pool, id)

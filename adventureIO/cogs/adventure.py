@@ -129,6 +129,25 @@ class AdventureCog(Cog):
             f"{ctx.prefix}activate!"
         )
 
+    @command(name="activate")
+    async def activate_player_command(self, ctx, member:discord.Member = None):
+        if not member:
+            member = ctx.author
+
+        player_row = await database.fetch_player(self.bot.pool, member.id)
+
+        if not player:
+            return await ctx.send(
+                f"No account found, please create one with {ctx.prefix}create"
+            )
+
+        player = Player.from_database(member, player_row)
+        
+        if player.activated:
+            return await ctx.send("Your account is already activated.")
+        
+        player.ativate(ctx, self.bot)
+        
 
 def setup(bot):
     bot.add_cog(AdventureCog(bot))
