@@ -28,8 +28,8 @@ class AdventureBot(Bot):
 
                 try:
                     self.load_extension(path)
-                    print(f"Loading... {path:<22} Success!")
-                    log.info(f"Loading... {path:<22} Success!")
+                    print(f"Loading... {path:<30} Success!")
+                    log.info(f"Loading... {path:<30} Success!")
                 except Exception:
-                    log.exception(f"\nLoading... {path:<22} Failed!")
-                    print(f"Loading... {path:<22} Failed!")
+                    log.exception(f"\nLoading... {path:<30} Failed!")
+                    print(f"Loading... {path:<30} Failed!")

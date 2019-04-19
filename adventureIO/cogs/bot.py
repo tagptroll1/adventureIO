@@ -1,7 +1,7 @@
 import os
 
 from discord.ext.commands import Cog, command, group
-from adventureIO.constants import IDS, Originator
+from adventureIO.constants import Bot, IDS, Originator
 
 OWNERS = (*IDS.creators, IDS.benny)
 
@@ -97,6 +97,13 @@ class BotCog(Cog):
             return await ctx.send(f"```{e}```")
 
         await ctx.send("Done")
+
+    @command()
+    async def invite(self, ctx):
+        await ctx.send(
+            "https://discordapp.com/oauth2/authorize?"
+            f"&client_id={Bot.client_id}&scope=bot&permissions=0"
+        )
 
 
 def setup(bot):

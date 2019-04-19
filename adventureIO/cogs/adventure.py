@@ -1,3 +1,4 @@
+from discord import Member
 from discord.ext.commands import Cog, command, group
 
 from adventureIO import database
@@ -105,15 +106,19 @@ class AdventureCog(Cog):
 
     @command(name="create")
     async def create_player_command(self, ctx):
-        package = {
-            "playerid": ctx.author.id,
-            "name": ctx.author.display_name,
-        }
+        if ctx.author.id in self.active_players:
+            player = self.active_players.get(ctx.author.id)
+        else:
+            package = {
+                "playerid": ctx.author.id,
+                "name": ctx.author.display_name,
+            }
 
-        player = await database.insert_player(self.bot.pool, package)
+            player_row = await database.insert_player(self.bot.pool, package)
+            player = Player.from_database(ctx.author, player_row)
 
         if player:
-            if not player["activated"]:
+            if not player.activated:
                 return await ctx.send(
                     f"{ctx.author.mention} already have an account, "
                     "but is not activated!\n"
@@ -130,23 +135,30 @@ class AdventureCog(Cog):
         )
 
     @command(name="activate")
-    async def activate_player_command(self, ctx, member:discord.Member = None):
+    async def activate_player_command(self, ctx, member: Member = None):
         if not member:
             member = ctx.author
 
-        player_row = await database.fetch_player(self.bot.pool, member.id)
+        if member.id not in self.active_players:
+            player_row = await database.fetch_player(self.bot.pool, member.id)
 
-        if not player:
-            return await ctx.send(
-                f"No account found, please create one with {ctx.prefix}create"
-            )
+            if not player_row:
+                return await ctx.send(
+                    f"No account found, please create one with {ctx.prefix}create"
+                )
 
-        player = Player.from_database(member, player_row)
-        
-        if player.activated:
+            player = Player.from_database(member, player_row)
+        else:
+            player = self.active_players.get(member.id)
+
+        if player and player.activated:
             return await ctx.send("Your account is already activated.")
         
-        player.ativate(ctx, self.bot)
+        if not player:
+            await ctx.send("wtf, couldnt find you?")
+
+        await player.activate(ctx)
+        self.active_players[member.id] = player
         
 
 def setup(bot):

@@ -19,7 +19,7 @@ class Player:
             _, _, hp, max_hp,
             atk, res, crit, skillpoints,
             level, xp, money, activ, adventure_id
-        ) = stats
+        ) = row
 
         player = cls(member)
         player.health = hp
@@ -76,7 +76,8 @@ class Player:
             return await ctx.send("You're already activated!")
 
         # TODO: Start session to add skillpoints to player
-        # self.activated = True
+        self.activated = True
+        await ctx.send("Activated!")
 
     def revive(self):
         self.health = self.max_health
