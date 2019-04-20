@@ -1,12 +1,38 @@
 # Adventure database columns
 
 -   player_id - int
-
 -   type - string
-
 -   running - bool
-
 -   enemy_id - int
+
+# Player database columns
+
+* playerid - id
+* name - string
+* hp - int
+* maxhp - int
+* atk - int
+* res - int
+* crit - int
+* luck - int
+* skillpoints - int
+* level - int
+* xp - int
+* money - int
+* activated - bool
+* adventureid - id
+
+# Item database columns
+
+* itemid - serial
+* name - string
+* price - int
+* weight - int
+* rarity - int (1 - 5?)
+* use_value - int
+* use_value2 - int
+* shop - bool (bought from vendor?)
+* inventoryid - id
 
 # Database methods
 
