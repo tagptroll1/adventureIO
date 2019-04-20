@@ -1,11 +1,52 @@
-from discord.ext.commands import Cog, group
+import asyncio
+
+import discord
+from discord.ext.commands import Cog, command, group
 
 import adventureIO.database as database
+from adventureIO.constants import Emoji
+
+
+async def start_listening(ctx, reactions):
+    await asyncio.sleep(0)
+
+    def check(r, u):
+        if u.bot:
+            return False
+        if r.emoji not in reactions:
+            return False
+        return True
+
+    while True:
+        
+        try:
+            reaction, user = await ctx.bot.wait_for(
+                "reaction_add", check=check, timeout=30
+            )
+        except asyncio.TimeoutError:
+            print("Reaction wait broke")
+            break
+        print(reaction.emoji, user.name)
 
 
 class AdventureDevelopmentCog(Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    @command()
+    async def reaction(self, ctx):
+        embed = discord.Embed()
+        msg = await ctx.send(embed=embed)
+
+        reactions = [
+            Emoji._1, Emoji._2, Emoji._3,
+            Emoji._4, Emoji._5, Emoji._6
+        ]
+
+        ctx.bot.loop.create_task(start_listening(ctx, reactions))
+        for reaction in reactions:
+            await msg.add_reaction(reaction)
+
 
     @group(name="dev")
     async def developer_group(self, ctx):

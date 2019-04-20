@@ -115,6 +115,10 @@ class AdventureCog(Cog):
             }
 
             player_row = await database.insert_player(self.bot.pool, package)
+            
+            if not player_row:
+                player_row = await database.fetch_player(self.bot.pool, ctx.author.id)
+                
             player = Player.from_database(ctx.author, player_row)
 
         if player:

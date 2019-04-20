@@ -38,6 +38,7 @@ async def setup_tables(
                     atk INTEGER DEFAULT 5,
                     res INTEGER DEFAULT 5,
                     crit INTEGER DEFAULT 1,
+                    luck INTEGER DEFAULT 0,
                     skillpoints INTEGER DEFAULT 5,
                     level INTEGER DEFAULT 1,
                     xp INTEGER DEFAULT 0,
