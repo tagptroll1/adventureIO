@@ -25,7 +25,7 @@ class AdventureCog(Cog):
         player = self.active_players.get(player_id)
         if player:
             await self.bot.db.update_player(player)
-            
+
         print("Totally saved", player_id)
 
     async def update_player_queue(self, player_id):
@@ -45,6 +45,7 @@ class AdventureCog(Cog):
                 print(
                     "Tried to delete from adeventures "
                     "on queue update above 1000 entries"
+                    "but id was not in dictionary"
                 )
 
             try:
@@ -52,7 +53,8 @@ class AdventureCog(Cog):
             except IndexError:
                 print(
                     "Tried to delete from players "
-                    "on queue update above 1000 entries"
+                    "on queue update above 1000 entries "
+                    "but id was not in dictionary"
                 )
 
     @group(name="adventure", aliases=("adv", "a"), invoke_without_command=True)
