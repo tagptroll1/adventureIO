@@ -100,7 +100,7 @@ class Database:
         SQL = (
             """
             UPDATE player
-                SET 
+                SET
                     hp = $2,
                     maxhp = $3,
                     atk = $4,

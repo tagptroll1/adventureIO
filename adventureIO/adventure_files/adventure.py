@@ -36,7 +36,7 @@ class Adventure:
     def revive(self):
         if self.player.hp > 0:
             return True
-            
+
         self.player.revive()
         self.running = False
         self.type = None
@@ -59,4 +59,4 @@ class Adventure:
                 self.running = False
                 self.type = None
             elif self.player.health <= 0:
-                print(player, "died")
+                print(self.player, "died")

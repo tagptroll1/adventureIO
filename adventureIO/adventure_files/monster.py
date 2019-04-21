@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import discord
 import yaml
 
@@ -35,7 +33,9 @@ class Monster:
         )
         embed.set_thumbnail(url=self.thumbnail)
         embed.color = discord.Colour.red()
-        embed.set_footer(text=f"Type .adventure 1 to fight or .adventure 2 to flee")
+        embed.set_footer(
+            text=f"Type .adventure 1 to fight or .adventure 2 to flee"
+        )
         return embed
 
     @property

@@ -59,7 +59,7 @@ class Battle:
         )
         embed.color = discord.Colour.gold()
         embed.set_thumbnail(url=self.enemy.thumbnail)
-        
+
         return embed
 
     def battle_embed(self, report):
@@ -88,7 +88,7 @@ class Battle:
         embed.set_footer(
             text=f"Type .adventure 1 to fight or .adventure 2 to flee"
         )
-        
+
         return embed
 
     def win_embed(self, report):
@@ -114,7 +114,7 @@ class Battle:
         embed.set_footer(
             text="You gained 5 xp, and looted 1 coin!"
         )
-        
+
         return embed
 
     def lost_embed(self, report):

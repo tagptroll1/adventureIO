@@ -2,7 +2,6 @@ from discord import Member
 from discord.ext.commands import Cog, command, cooldown, group
 from discord.ext.commands.cooldowns import BucketType
 
-from adventureIO import database
 from ..adventure_files.adventure import Adventure
 from adventureIO.constants import AdvConfig
 from ..adventure_files.player import Player
@@ -21,7 +20,7 @@ class AdventureCog(Cog):
         ...
 
     async def ensure_save(self, player_id):
-        adventure = self.active_adventures.get(player_id)
+        # adventure = self.active_adventures.get(player_id)
         # if adventure:
         #   await self.bot.db.update_adventure()
         player = self.active_players.get(player_id)
@@ -58,9 +57,6 @@ class AdventureCog(Cog):
                     "on queue update above 1000 entries "
                     "but id was not in dictionary"
                 )
-
-        print("queue: ", self.queue)
-        print("players: ", self.active_players)
 
     @cooldown(1, 5, BucketType.user)
     @group(name="adventure", aliases=("adv", "a"), invoke_without_command=True)
@@ -149,7 +145,6 @@ class AdventureCog(Cog):
             player.revive()
             await ctx.send("Revived")
             await self.bot.db.update_player(player)
-        
 
     @command(name="create")
     async def create_player_command(self, ctx):
