@@ -63,10 +63,16 @@
 - [ ] Get exp from kills
 - [ ] get money from kills
 - [ ] linear leveling with modulus or increase the level attribute with an exponential xp need.
+- [ ] adventure alternatives with different stories and paths
+- [ ] potions and shop
+- [ ] longer cooldown events like mining, chopping, fishing
+- [ ] revive costs x% of xp and money, and revives with 50% of total hp.
+- [ ] aliases for adventure options
+- [ ] timeout dev add item 
 
 bug:
     - Create says an account already exists on first use
-    - If timeout timeouts you cant add skillspoints
-    - not activated and revive throws coroutine doesnt have activated attr `line 139, if not player.activated`
-    - queue saves the one being pushed, not the popped?
+        - If timeout timeouts you cant add skillspoints
+        - not activated and revive throws coroutine doesnt have activated attr `line 139, if not player.activated`
+        - queue saves the one being pushed, not the popped?
 put mention in response
