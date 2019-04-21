@@ -61,6 +61,24 @@ class Player:
         return object.__getattribute__(self, name)
 
     @property
+    def row(self):
+        return (
+            self.id,
+            self.health,
+            self.max_health,
+            self.attack,
+            self.resistance,
+            self.crit,
+            self.luck,
+            self.skillpoints,
+            self.level,
+            self.xp,
+            self.money,
+            self.activated,
+            self.adventure_id
+        )
+
+    @property
     def hp(self):
         return self.health
 

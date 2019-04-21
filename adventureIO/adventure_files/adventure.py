@@ -36,6 +36,9 @@ class Adventure:
         await self.continue_(ctx.channel, rest)
 
     def revive(self):
+        if self.player.hp > 0:
+            return True
+            
         self.player.revive()
         self.running = False
         self.type = None

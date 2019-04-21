@@ -58,7 +58,13 @@ class AdventureCog(Cog):
         author = ctx.author
 
         if author.id not in self.active_players:
-            player = Player(author)
+            player_row = await self.bot.db.fetch_player(author.id)
+
+            if player_row:
+                player = Player.from_database(author, player_row)
+            else:
+                player = Player(author)
+
             if not player.activated:
                 return await ctx.send(
                     "Please create an account before playing.\n"
@@ -81,6 +87,8 @@ class AdventureCog(Cog):
         else:
             await adventure.start(ctx, rest)
 
+        await self.bot.db.update_player(player)
+
     @adventure_group.command(name="2")
     async def adventure_alt_2(self, ctx, *, rest=None):
         author = ctx.author
@@ -99,10 +107,29 @@ class AdventureCog(Cog):
     async def adventure_revive(self, ctx):
         adventure = self.active_adventures.get(ctx.author.id)
         if adventure:
-            adventure.revive()
-            await ctx.send("Revived")
+            if not adventure.revive():
+                await ctx.send("Revived")
+            else:
+                await ctx.send("You're not dead...")
         else:
-            await ctx.send("You don't even have an adventure going..")
+            player = self.active_players.get(ctx.author.id)
+
+            if not player:
+                player = self.bot.db.fetch_player(ctx.author.id)
+
+            if not player:
+                return await ctx.send("Create an account first!")
+
+            if not player.activated:
+                return await ctx.send("Activate your account first!")
+
+            if player.hp > 0:
+                return await ctx.send("You're not even dead...")
+
+            player.revive()
+            await ctx.send("Reived")
+        await self.bot.db.update_player(player)
+        
 
     @command(name="create")
     async def create_player_command(self, ctx):
@@ -114,31 +141,28 @@ class AdventureCog(Cog):
                 "name": ctx.author.display_name,
             }
 
-            player_row = await self.bot.db.insert_player(package)
+            await self.bot.db.insert_player(package)
 
-            if not player_row:
-                player_row = await database.fetch_player(
-                    self.bot.pool, ctx.author.id
-                )
+            player_row = await self.bot.db.fetch_player(ctx.author.id)
 
             player = Player.from_database(ctx.author, player_row)
 
-        if player:
-            if not player.activated:
-                return await ctx.send(
-                    f"{ctx.author.mention} already have an account, "
-                    "but is not activated!\n"
-                    f"{ctx.prefix}activate to activate your account."
-                )
+        if player and not player.activated:
+            return await ctx.send(
+                f"{ctx.author.mention} already have an account, "
+                "but is not activated!\n"
+                f"{ctx.prefix}activate to activate your account."
+            )
+        elif player:
             return await ctx.send(
                 f"{ctx.author.mention} "
                 "already have an account!"
             )
-
-        await ctx.send(
-            f"Created account, don't forget to activate it with "
-            f"{ctx.prefix}activate!"
-        )
+        else:
+            await ctx.send(
+                f"Created account, don't forget to activate it with "
+                f"{ctx.prefix}activate!"
+            )
 
     @command(name="activate")
     async def activate_player_command(self, ctx, member: Member = None):
@@ -154,6 +178,7 @@ class AdventureCog(Cog):
                     f"please create one with {ctx.prefix}create"
                 )
 
+            print(player_row)
             player = Player.from_database(member, player_row)
         else:
             player = self.active_players.get(member.id)

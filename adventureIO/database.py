@@ -1,5 +1,7 @@
 import collections
 
+import asyncpg
+
 
 class Database:
     def __init__(self, pool):
@@ -95,15 +97,31 @@ class Database:
         return result
 
     async def update_player(self, player):
-        ...
+        SQL = (
+            """
+            UPDATE player
+                SET 
+                    hp = $2,
+                    maxhp = $3,
+                    atk = $4,
+                    res = $5,
+                    crit = $6,
+                    luck = $7,
+                    skillpoints = $8,
+                    level = $9,
+                    xp = $10,
+                    money = $11,
+                    activated = $12,
+                    adventureid = $13
+                WHERE playerid = $1
+            """
+        )
+
+        async with self.pool.acquire() as conn:
+            await conn.execute(SQL, *player.row)
 
     async def insert_player(self, stats):
-        # TODO: Look into if we can avoid having multiple queries
         async with self.pool.acquire() as conn:
-            result = await self.fetch_player(stats["playerid"], conn)
-            if result:
-                return result
-
             SQL = (
                 """
                 INSERT INTO player(
@@ -111,10 +129,13 @@ class Database:
                 ) VALUES ($1, $2);
                 """
             )
-            await conn.execute(
-                SQL, stats["playerid"], stats["name"]
-                )
-            return False  # return result above has a True-ish value
+            try:
+                await conn.execute(
+                    SQL, stats["playerid"], stats["name"]
+                    )
+            except asyncpg.UniqueViolationError:
+                return False
+            return True
 
     async def check_item_exists(self, name):
         async with self.pool.acquire() as conn:

@@ -52,3 +52,11 @@
     -   [x] display all players
     -   [ ] search players
 -   [x] fetch_player(pool, id)
+
+
+
+- [ ] Adventure cog doesn't need to load adventures and players on creation
+
+- [ ] Each adventure needs to be pushed through the queue function when it's needed,  This has to fetch from the database first to ensure synced data.  
+
+- [ ] All actions that change the player needs to be queued in a temp cache that executes many every minute or so, and the bot has to enforce this is saved before it shuts down.  Preferably caught Keyboard interrupt as well.
