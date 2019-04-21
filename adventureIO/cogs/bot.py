@@ -10,9 +10,10 @@ class BotCog(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @group(name="git")
+    @group(name="git", invoke_without_command=True)
     async def git_group(self, ctx):
         """Group for git commands"""
+        await ctx.send("https://www.github.com/tagptroll1/AdventureIO")
 
     @git_group.command(name="pull")
     async def git_pull_command(self, ctx):

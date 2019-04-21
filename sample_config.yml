@@ -33,5 +33,11 @@ emoji:
     _9: "\u0039\u20e3"
     checkmark: "\u2705"
 
+    # Icons
+    health: ":health:569559545567903745"
+    attack: ":attack:569559545584549888"
+    resistance: ":resistance:569559545236553768"
+    crit: ":crit:569559545513508884"
+
 adv_config:
     queue_size: 1000
