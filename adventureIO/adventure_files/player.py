@@ -79,6 +79,10 @@ class Player:
         )
 
     @property
+    def dead(self):
+        return self.health <= 0
+
+    @property
     def hp(self):
         return self.health
 

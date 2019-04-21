@@ -13,29 +13,19 @@ class AdventureCog(Cog):
         self.active_players = {}
         self.queue = []
 
-        # bot.loop.create_task(self.async__init__())
+        bot.loop.create_task(self.async__init__())
 
     async def async__init__(self):
         ...
-        # async for adventure in database.get_adventurers():
-        #   player = self.bot.get_user(adventure["player_id"])
-        #   type = adventure["type"]
-        #   running = adventure["running"]
-        #   enemy_tuple = await database.get_active_mob(adventure["enemy_id"])
-        #   enemy_params = (
-        #       "id", "name", "desc", "hp", "atk",
-        #       "res", "crit", "loot", "max_hp",
-        #   )
-        #   enemy_dict = dict(zip(enemy_params, enemy_tuple))
-        #   enemy = Enemy(**enemy_dict)
-        #   instance = Battle(player, enemy)
-        #   adventure = Adventure(player, type, running, instance)
-        #   self.active_adventures[player.id] = adventure
-        #   self.active_players[player.id] = player
-        #   await self.update_player_queue(player.id)
-        # print("Loaded", len(self.queue), "adventures")
 
     async def ensure_save(self, player_id):
+        adventure = self.active_adventures.get(player_id)
+        # if adventure:
+        #   await self.bot.db.update_adventure()
+        player = self.active_players.get(player_id)
+        if player:
+            await self.bot.db.update_player(player)
+            
         print("Totally saved", player_id)
 
     async def update_player_queue(self, player_id):
@@ -46,7 +36,24 @@ class AdventureCog(Cog):
             self.queue.append(player_id)
 
         if len(self.queue) > 1000:
-            await self.ensure_save(self.queue.pop())
+            to_del = self.queue.pop()
+            await self.ensure_save(to_del)
+
+            try:
+                del self.active_adventures[to_del]
+            except IndexError:
+                print(
+                    "Tried to delete from adeventures "
+                    "on queue update above 1000 entries"
+                )
+
+            try:
+                del self.active_players[to_del]
+            except IndexError:
+                print(
+                    "Tried to delete from players "
+                    "on queue update above 1000 entries"
+                )
 
     @group(name="adventure", aliases=("adv", "a"), invoke_without_command=True)
     async def adventure_group(self, ctx, *, rest=None):
@@ -73,6 +80,9 @@ class AdventureCog(Cog):
             self.active_players[author.id] = player
 
         player = self.active_players[author.id]
+
+        if player.dead:
+            return await ctx.send("You're dead, silly!")
 
         if author.id not in self.active_adventures:
             adventure = Adventure(player)
@@ -127,8 +137,8 @@ class AdventureCog(Cog):
                 return await ctx.send("You're not even dead...")
 
             player.revive()
-            await ctx.send("Reived")
-        await self.bot.db.update_player(player)
+            await ctx.send("Revived")
+            await self.bot.db.update_player(player)
         
 
     @command(name="create")
