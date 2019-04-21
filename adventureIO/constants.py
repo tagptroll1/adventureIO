@@ -72,3 +72,9 @@ class Emoji(metaclass=YAMLGetter):
     _9: str
 
     checkmark: str
+
+
+class AdvConfig(metaclass=YAMLGetter):
+    section = "adv_config"
+
+    queue_size: str

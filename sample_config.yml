@@ -32,3 +32,6 @@ emoji:
     _8: "\u0038\u20e3"
     _9: "\u0039\u20e3"
     checkmark: "\u2705"
+
+adv_config:
+    queue_size: 1000

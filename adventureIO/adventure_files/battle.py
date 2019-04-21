@@ -1,5 +1,8 @@
 import random
 
+import discord
+
+from adventureIO.constants import Emoji
 from .monster import Monster
 
 BOAR = 1
@@ -27,7 +30,7 @@ TEMP_MONSTER_STATS = {
     },
     2: {
         "name": "Goblin",
-        "desc": "It looks like David.",
+        "desc": "It looks like a goblin.",
         "hp": 100,
         "atk": 3,
         "res": 2,
@@ -47,6 +50,98 @@ class Battle:
         monster_id = random.choice(ENEMIES)
         stats = TEMP_MONSTER_STATS[monster_id]
         self.enemy = Monster(**stats)
+
+    def base_embed(self, title):
+        embed = discord.Embed(title=title)
+        embed.set_author(
+            name=self.player.name,
+            icon_url=self.player.member.avatar_url
+        )
+        embed.color = discord.Colour.gold()
+        embed.set_thumbnail(url=self.enemy.thumbnail)
+        
+        return embed
+
+    def battle_embed(self, report):
+        player = self.player
+        enemy = self.enemy
+        embed = self.base_embed("Battle info")
+
+        pcrit = "a critical hit of " if report["player_crit"] else ""
+        mcrit = "a critical hit of " if report["monster_crit"] else ""
+
+        description = (
+            f"{player.name} rolled {pcrit}"
+            f"<{Emoji.attack}>{report['player_dmg']}",
+
+            f"{enemy.name} rolled {mcrit}"
+            f"<{Emoji.attack}>{report['monster_dmg']}",
+            " ",
+            f"{player.name} has <{Emoji.health}>"
+            f"{player.hp}/{player.max_hp} left.",
+
+            f"{enemy.name} has <{Emoji.health}>"
+            f"{enemy.hp}/{enemy.max_hp} left.\n "
+        )
+        embed.description = "\n".join(description)
+
+        embed.set_footer(
+            text=f"Type .adventure 1 to fight or .adventure 2 to flee"
+        )
+        
+        return embed
+
+    def win_embed(self, report):
+        player = self.player
+        enemy = self.enemy
+        embed = self.base_embed("You win!")
+        embed.color = discord.Color.green()
+
+        pcrit = "a critical hit of " if report["player_crit"] else ""
+
+        description = (
+            f"{player.name} rolled {pcrit}"
+            f"<{Emoji.attack}>{report['player_dmg']}",
+
+            " ",
+            f"{enemy.name} has been slain.",
+
+            f"{player.name} has <{Emoji.health}>"
+            f"{player.hp}/{player.max_hp} left.",
+        )
+        embed.description = "\n".join(description)
+
+        embed.set_footer(
+            text="You gained 5 xp, and looted 1 coin!"
+        )
+        
+        return embed
+
+    def lost_embed(self, report):
+        player = self.player
+        enemy = self.enemy
+        embed = self.base_embed("You died")
+        embed.color = discord.Color.red()
+
+        pcrit = "a critical hit of " if report["player_crit"] else ""
+        mcrit = "a critical hit of " if report["monster_crit"] else ""
+
+        description = (
+            f"{player.name} rolled {pcrit}"
+            f"<{Emoji.attack}>{report['player_dmg']}",
+
+            f"{enemy.name} rolled {mcrit}"
+            f"<{Emoji.attack}>{report['monster_dmg']}",
+            " ",
+            f"{enemy.name} has <{Emoji.health}>"
+            f"{enemy.hp}/{enemy.max_hp} left.",
+            f"{player.name} was slain.."
+        )
+
+        embed.description = "\n".join(description)
+        embed.set_footer(text="You can revive with .adventure revive")
+
+        return embed
 
     @staticmethod
     def get_roll(attack):
@@ -104,64 +199,20 @@ class Battle:
         report["monster_crit"] = m_crit
         report["player_hp"] = player.health
 
-        return await self.print_battlestatus(channel, report)
+        if player.health > 0:
+            return await self.battle_step(channel, report)
+        else:
+            return await self.player_died(channel, report)
 
     async def monster_died(self, channel, report):
-        monster = self.enemy
-        name = self.player.display_name
-
-        if report["player_crit"]:
-            crit = "with a critial blow"
-        else:
-            crit = ""
-
-        await channel.send(
-            f"{name} hit {monster.name} {crit} for {report['player_dmg']}\n"
-            f"{monster.name} was slain! \n"
-            f"{name} has "
-            f"{report['player_hp']}/{self.player.max_hp} hp left."
-        )
+        await channel.send(embed=self.win_embed(report))
         self.enemy = None
         return report["player_hp"]
 
     async def player_died(self, channel, report):
-        monster = self.enemy
-        await channel.send(
-            f"{self.player.display_name} was slain by "
-            f"{monster.name}.\n"
-        )
+        await channel.send(embed=self.lost_embed(report))
         return 0
 
-    async def print_battlestatus(self, channel, report):
-        monster = self.enemy
-        name = self.player.display_name
-        m_dmg = report["monster_dmg"]
-        p_dmg = report["player_dmg"]
-
-        if report["player_crit"]:
-            crit = "with a critial blow"
-        else:
-            crit = ""
-
-        if report["monster_crit"]:
-            m_crit = "with a powerful strike"
-        else:
-            m_crit = ""
-
-        response = (
-            f"{name} hit {monster.name} {crit} for {p_dmg}\n"
-            f"{monster.name} hit {name} {m_crit} for {m_dmg}\n"
-            f"{monster.name} has "
-            f"{monster.hp}/{monster.max_hp} hp left."
-        )
-
-        if self.player.hp > 0:
-            response += (
-                f"\n{name} has "
-                f"{report['player_hp']}/{self.player.max_hp} hp left."
-            )
-            await channel.send(response)
-            return self.player.hp
-        else:
-            await channel.send(response)
-            return await self.player_died(channel, report)
+    async def battle_step(self, channel, report):
+        await channel.send(embed=self.battle_embed(report))
+        return self.player.health

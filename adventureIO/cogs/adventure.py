@@ -1,8 +1,10 @@
 from discord import Member
-from discord.ext.commands import Cog, command, group
+from discord.ext.commands import Cog, command, cooldown, group
+from discord.ext.commands.cooldowns import BucketType
 
 from adventureIO import database
 from ..adventure_files.adventure import Adventure
+from adventureIO.constants import AdvConfig
 from ..adventure_files.player import Player
 
 
@@ -35,8 +37,8 @@ class AdventureCog(Cog):
         else:
             self.queue.append(player_id)
 
-        if len(self.queue) > 1000:
-            to_del = self.queue.pop()
+        if len(self.queue) > AdvConfig.queue_size:
+            to_del = self.queue.pop(0)
             await self.ensure_save(to_del)
 
             try:
@@ -57,11 +59,16 @@ class AdventureCog(Cog):
                     "but id was not in dictionary"
                 )
 
+        print("queue: ", self.queue)
+        print("players: ", self.active_players)
+
+    @cooldown(1, 5, BucketType.user)
     @group(name="adventure", aliases=("adv", "a"), invoke_without_command=True)
     async def adventure_group(self, ctx, *, rest=None):
 
         await ctx.invoke(self.adventure_alt_1, rest=rest)
 
+    @cooldown(1, 5, BucketType.user)
     @adventure_group.command(name="1")
     async def adventure_alt_1(self, ctx, *, rest=None):
         author = ctx.author
@@ -101,6 +108,7 @@ class AdventureCog(Cog):
 
         await self.bot.db.update_player(player)
 
+    @cooldown(1, 5, BucketType.user)
     @adventure_group.command(name="2")
     async def adventure_alt_2(self, ctx, *, rest=None):
         author = ctx.author

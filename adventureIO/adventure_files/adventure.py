@@ -24,11 +24,9 @@ class Adventure:
 
                 mob = self.instance.enemy
                 await ctx.send(
-                    f"You ran into a {mob.name}.\n"
-                    f"{mob.hp}\n"
-                    f"{mob.desc}\n\n"
-                    f"Type {ctx.prefix}adventure 1 to fight, 2 to flee"
-                )
+                    f"{self.player.member.mention} you found a {mob.name}",
+                    embed=mob.embed
+                    )
                 self.running = True
 
                 return
@@ -61,4 +59,4 @@ class Adventure:
                 self.running = False
                 self.type = None
             elif self.player.health <= 0:
-                await channel.send("Lol...")
+                print(player, "died")
