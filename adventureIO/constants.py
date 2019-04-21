@@ -56,6 +56,7 @@ class Database(metaclass=YAMLGetter):
     host: str
     port: int
 
+
 class Emoji(metaclass=YAMLGetter):
     section = "emoji"
 

@@ -20,8 +20,8 @@ class Player:
     def from_database(cls, member, row):
         (
             _, _, hp, max_hp,
-            atk, res, crit, luck, 
-            skillpoints, level, xp, 
+            atk, res, crit, luck,
+            skillpoints, level, xp,
             money, activ, adventure_id
         ) = row
 
@@ -88,29 +88,30 @@ class Player:
 
         reactions = (Emoji._1, Emoji._2, Emoji._3, Emoji._4, Emoji._5)
 
-        ctx.bot.loop.create_task(self.add_skillpoints_loop(ctx.bot, msg, reactions))
+        ctx.bot.loop.create_task(
+            self.add_skillpoints_loop(ctx.bot, msg, reactions)
+        )
         for reaction in reactions:
             await msg.add_reaction(reaction)
 
         return
         await ctx.send("Activated!")
 
-    async def add_skillpoints_loop(self, bot, msg, reactions):
+    async def add_skillpoints_loop(self, bot, msg, emojis):
         def check(r, u):
             if u.bot:
                 return False
             if r.message.id != msg.id:
                 return False
-            if r.emoji not in reactions:
+            if r.emoji not in emojis:
                 return False
             return True
-
 
         while self.skillpoints > 0:
             try:
                 reaction, member = await bot.wait_for(
-                    "reaction_add", 
-                    check=check, 
+                    "reaction_add",
+                    check=check,
                     timeout=60
                 )
             except asyncio.TimeoutError:
@@ -131,7 +132,7 @@ class Player:
                 print("Unknown emoji? ", reaction.emoji)
                 continue
 
-            if self.skillpoints > 0: #  Probably redundant
+            if self.skillpoints > 0:  # Probably redundant
                 self.skillpoints -= 1
 
             embed = self.freeskillpoints_embed()
@@ -151,8 +152,8 @@ class Player:
 
         longest = max(
             [
-                len(str(num)) 
-                for num 
+                len(str(num))
+                for num
                 in (self.max_hp, self.attack, self.res, self.crit, self.luck)
             ]
         )
@@ -167,9 +168,9 @@ class Player:
             f"5. {'Luck:':<12}  [{self.luck:>{longest}}] ⁺¹\n"
             "```"
         )
+        url = "https://cdn.discordapp.com/emojis/470326273298792469.png?v=1"
         embed.set_footer(
             text="You can not retrieve spent skillpoints!",
-            icon_url="https://cdn.discordapp.com/emojis/470326273298792469.png?v=1"
+            icon_url=url
         )
         return embed
-

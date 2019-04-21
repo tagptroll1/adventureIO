@@ -142,7 +142,7 @@ async def check_item_exists(pool, name):
 
 
 async def delete_by_id(pool, _id, table):
-    id_column = table[:-1]+"id"
+    id_column = table + "id"
     SQL = f"DELETE FROM {table} where {id_column}=$1;"
 
     async with pool.acquire() as conn:

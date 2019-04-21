@@ -115,10 +115,12 @@ class AdventureCog(Cog):
             }
 
             player_row = await database.insert_player(self.bot.pool, package)
-            
+
             if not player_row:
-                player_row = await database.fetch_player(self.bot.pool, ctx.author.id)
-                
+                player_row = await database.fetch_player(
+                    self.bot.pool, ctx.author.id
+                )
+
             player = Player.from_database(ctx.author, player_row)
 
         if player:
@@ -148,7 +150,8 @@ class AdventureCog(Cog):
 
             if not player_row:
                 return await ctx.send(
-                    f"No account found, please create one with {ctx.prefix}create"
+                    "No account found, "
+                    f"please create one with {ctx.prefix}create"
                 )
 
             player = Player.from_database(member, player_row)
@@ -157,13 +160,13 @@ class AdventureCog(Cog):
 
         if player and player.activated:
             return await ctx.send("Your account is already activated.")
-        
+
         if not player:
             await ctx.send("wtf, couldnt find you?")
 
         await player.activate(ctx)
         self.active_players[member.id] = player
-        
+
 
 def setup(bot):
     bot.add_cog(AdventureCog(bot))

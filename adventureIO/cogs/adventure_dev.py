@@ -18,7 +18,6 @@ async def start_listening(ctx, reactions):
         return True
 
     while True:
-        
         try:
             reaction, user = await ctx.bot.wait_for(
                 "reaction_add", check=check, timeout=30
@@ -46,7 +45,6 @@ class AdventureDevelopmentCog(Cog):
         ctx.bot.loop.create_task(start_listening(ctx, reactions))
         for reaction in reactions:
             await msg.add_reaction(reaction)
-
 
     @group(name="dev")
     async def developer_group(self, ctx):
@@ -150,14 +148,13 @@ class AdventureDevelopmentCog(Cog):
     @developer_get_group.command(name="player", aliases=["players", "p"])
     async def dev_get_players_command(self, ctx):
         players = [
-            ", ".join(str(col) for col in player) 
-            async for player 
+            ", ".join(str(col) for col in player)
+            async for player
             in database.AllPlayers(self.bot.pool)
         ]
 
         codeblock = "```{}```"
         await ctx.send(codeblock.format("\n".join(players)))
-        
 
     @developer_get_group.command(name="item", aliases=["items", "i"])
     async def dev_get_items_command(self, ctx):
