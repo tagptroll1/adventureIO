@@ -139,8 +139,14 @@ class Player:
             await msg.edit(embed=embed)
             await msg.remove_reaction(reaction, member)
 
-        await msg.clear_reactions()
-        await msg.add_reaction(Emoji.checkmark)
+        try:
+            await msg.clear_reactions()
+            await msg.add_reaction(Emoji.checkmark)
+        except discord.Forbidden:
+            print("Missing permissions to clear reactions")
+
+        if bot.db:
+            await bot.db.update_player(self)
 
     def revive(self):
         self.health = self.max_health

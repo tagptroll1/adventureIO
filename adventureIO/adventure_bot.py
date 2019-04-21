@@ -8,9 +8,9 @@ log = logging.getLogger(__name__)
 
 
 class AdventureBot(Bot):
-    def __init__(self, pool=None, **kwargs):
+    def __init__(self, db=None, **kwargs):
         super().__init__(**kwargs)
-        self.pool = pool
+        self.db = db
         self.load_extensions()
 
     async def on_message(self, message):
