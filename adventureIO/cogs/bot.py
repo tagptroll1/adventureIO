@@ -1,3 +1,5 @@
+__author__ = "me!"
+
 import os
 
 from discord.ext.commands import Cog, command, group
