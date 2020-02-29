@@ -9,7 +9,7 @@ pyyaml = {git = "https://github.com/yaml/pyyaml.git",editable = true}
 discord-py = {git = "https://github.com/Rapptz/discord.py.git",ref = "d48a424f6f464044a59275d5e885b493a4a1aef7",editable = true}
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"
 
 [scripts]
 start = "python -m adventureIO"
