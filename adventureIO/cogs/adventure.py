@@ -1,11 +1,10 @@
-import asyncio
-import random
-
-from discord.ext.commands import Cog, command, group
+from discord import Member
+from discord.ext.commands import Cog, command, cooldown, group
+from discord.ext.commands.cooldowns import BucketType
 
 from ..adventure_files.adventure import Adventure
+from adventureIO.constants import AdvConfig
 from ..adventure_files.player import Player
-from ..adventure_files.players import players
 
 
 class AdventureCog(Cog):
@@ -15,26 +14,19 @@ class AdventureCog(Cog):
         self.active_players = {}
         self.queue = []
 
-        # bot.loop.create_task(self.async__init__())
+        bot.loop.create_task(self.async__init__())
 
     async def async__init__(self):
         ...
-        # async for adventure in database.get_adventurers():
-        #   player = self.bot.get_user(adventure["player_id"])
-        #   type = adventure["type"]
-        #   running = adventure["running"]
-        #   enemy_tuple = await database.get_active_mob(adventure["enemy_id"])
-        #   enemy_params = ("id", "name", "desc", "hp", "atk", "res", "crit", "loot", "max_hp")
-        #   enemy_dict = dict(zip(enemy_params, enemy_tuple))
-        #   enemy = Enemy(**enemy_dict)
-        #   instance = Battle(player, enemy)
-        #   adventure = Adventure(player, type, running, instance)
-        #   self.active_adventures[player.id] = adventure
-        #   self.active_players[player.id] = player
-        #   await self.update_player_queue(player.id)
-        # print("Loaded", len(self.queue), "adventures")
 
     async def ensure_save(self, player_id):
+        # adventure = self.active_adventures.get(player_id)
+        # if adventure:
+        #   await self.bot.db.update_adventure()
+        player = self.active_players.get(player_id)
+        if player:
+            await self.bot.db.update_player(player)
+
         print("Totally saved", player_id)
 
     async def update_player_queue(self, player_id):
@@ -44,20 +36,47 @@ class AdventureCog(Cog):
         else:
             self.queue.append(player_id)
 
-        if len(self.queue) > 1000:
-            await self.ensure_save(self.queue.pop())
+        if len(self.queue) > AdvConfig.queue_size:
+            to_del = self.queue.pop(0)
+            await self.ensure_save(to_del)
 
+            try:
+                del self.active_adventures[to_del]
+            except IndexError:
+                print(
+                    "Tried to delete from adeventures "
+                    "on queue update above 1000 entries"
+                    "but id was not in dictionary"
+                )
+
+            try:
+                del self.active_players[to_del]
+            except IndexError:
+                print(
+                    "Tried to delete from players "
+                    "on queue update above 1000 entries "
+                    "but id was not in dictionary"
+                )
+
+    @cooldown(1, 5, BucketType.user)
     @group(name="adventure", aliases=("adv", "a"), invoke_without_command=True)
     async def adventure_group(self, ctx, *, rest=None):
 
         await ctx.invoke(self.adventure_alt_1, rest=rest)
 
+    @cooldown(1, 5, BucketType.user)
     @adventure_group.command(name="1")
     async def adventure_alt_1(self, ctx, *, rest=None):
         author = ctx.author
 
         if author.id not in self.active_players:
-            player = Player(author)
+            player_row = await self.bot.db.fetch_player(author.id)
+
+            if player_row:
+                player = Player.from_database(author, player_row)
+            else:
+                player = Player(author)
+
             if not player.activated:
                 return await ctx.send(
                     "Please create an account before playing.\n"
@@ -66,6 +85,9 @@ class AdventureCog(Cog):
             self.active_players[author.id] = player
 
         player = self.active_players[author.id]
+
+        if player.dead:
+            return await ctx.send("You're dead, silly!")
 
         if author.id not in self.active_adventures:
             adventure = Adventure(player)
@@ -80,6 +102,9 @@ class AdventureCog(Cog):
         else:
             await adventure.start(ctx, rest)
 
+        await self.bot.db.update_player(player)
+
+    @cooldown(1, 5, BucketType.user)
     @adventure_group.command(name="2")
     async def adventure_alt_2(self, ctx, *, rest=None):
         author = ctx.author
@@ -98,38 +123,89 @@ class AdventureCog(Cog):
     async def adventure_revive(self, ctx):
         adventure = self.active_adventures.get(ctx.author.id)
         if adventure:
-            adventure.revive()
-            await ctx.send("Revived")
+            if not adventure.revive():
+                await ctx.send("Revived")
+            else:
+                await ctx.send("You're not dead...")
         else:
-            await ctx.send("You don't even have an adventure going..")
+            player = self.active_players.get(ctx.author.id)
+
+            if not player:
+                player = self.bot.db.fetch_player(ctx.author.id)
+
+            if not player:
+                return await ctx.send("Create an account first!")
+
+            if not player.activated:
+                return await ctx.send("Activate your account first!")
+
+            if player.hp > 0:
+                return await ctx.send("You're not even dead...")
+
+            player.revive()
+            await ctx.send("Revived")
+            await self.bot.db.update_player(player)
 
     @command(name="create")
     async def create_player_command(self, ctx):
-        if ctx.author.id in players:
-            return await ctx.send("You already have an account")
+        if ctx.author.id in self.active_players:
+            player = self.active_players.get(ctx.author.id)
+        else:
+            package = {
+                "playerid": ctx.author.id,
+                "name": ctx.author.display_name,
+            }
 
-        default_stats = {
-            "id": ctx.author.id,
-            "name": ctx.author.display_name,
-            "max_hp": 30,
-            "atk": 5,
-            "res": 5,
-            "crit": 1,
-            "skillpoints": 5,
-            "level": 1,
-            "xp": 0,
-        }
+            await self.bot.db.insert_player(package)
 
-        if ctx.author.id not in self.active_players:
-            player = Player(ctx.author)
-            self.active_players[ctx.author.id] = player
-            await self.update_player_queue(ctx.author.id)
+            player_row = await self.bot.db.fetch_player(ctx.author.id)
 
-        player = self.active_players[ctx.author.id]
-        player.activate(30, 5, 5, 1)
-        players[ctx.author.id] = default_stats
+            player = Player.from_database(ctx.author, player_row)
 
-        await ctx.send(f"created! {default_stats}")
+        if player and not player.activated:
+            return await ctx.send(
+                f"{ctx.author.mention} already have an account, "
+                "but is not activated!\n"
+                f"{ctx.prefix}activate to activate your account."
+            )
+        elif player:
+            return await ctx.send(
+                f"{ctx.author.mention} "
+                "already have an account!"
+            )
+        else:
+            await ctx.send(
+                f"Created account, don't forget to activate it with "
+                f"{ctx.prefix}activate!"
+            )
+
+    @command(name="activate")
+    async def activate_player_command(self, ctx, member: Member = None):
+        if not member:
+            member = ctx.author
+
+        if member.id not in self.active_players:
+            player_row = await self.bot.db.fetch_player(member.id)
+
+            if not player_row:
+                return await ctx.send(
+                    "No account found, "
+                    f"please create one with {ctx.prefix}create"
+                )
+
+            print(player_row)
+            player = Player.from_database(member, player_row)
+        else:
+            player = self.active_players.get(member.id)
+
+        if player and player.activated:
+            return await ctx.send("Your account is already activated.")
+
+        if not player:
+            await ctx.send("wtf, couldnt find you?")
+
+        await player.activate(ctx)
+        self.active_players[member.id] = player
 
 
 def setup(bot):

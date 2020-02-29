@@ -43,6 +43,38 @@ class IDS(metaclass=YAMLGetter):
 
 class Originator(metaclass=YAMLGetter):
     section = "originator"
-    
+
     name: str
 
+
+class Database(metaclass=YAMLGetter):
+    section = "database"
+
+    user: str
+    password: str
+    database: str
+    host: str
+    port: int
+
+
+class Emoji(metaclass=YAMLGetter):
+    section = "emoji"
+
+    _0: str
+    _1: str
+    _2: str
+    _3: str
+    _4: str
+    _5: str
+    _6: str
+    _7: str
+    _8: str
+    _9: str
+
+    checkmark: str
+
+
+class AdvConfig(metaclass=YAMLGetter):
+    section = "adv_config"
+
+    queue_size: str

@@ -14,7 +14,7 @@ class Adventure:
         self.running = False
         self.instance = None
 
-    async def start(self, channel, rest):
+    async def start(self, ctx, rest):
         self.type = random.choice(ADVENTURE_TYPES)
 
         if self.type == BATTLE:
@@ -23,19 +23,20 @@ class Adventure:
                 await self.instance.setup()
 
                 mob = self.instance.enemy
-                await channel.send(
-                    f"You ran into a {mob.name}.\n"
-                    f"{mob.hp}\n"
-                    f"{mob.desc}\n\n"
-                    f"Type {ctx.prefix}adventure 1 to fight, 2 to flee"
-                )
+                await ctx.send(
+                    f"{self.player.member.mention} you found a {mob.name}",
+                    embed=mob.embed
+                    )
                 self.running = True
 
                 return
 
-        await self.continue_(channel, rest)
+        await self.continue_(ctx.channel, rest)
 
     def revive(self):
+        if self.player.hp > 0:
+            return True
+
         self.player.revive()
         self.running = False
         self.type = None
@@ -43,7 +44,7 @@ class Adventure:
 
     async def continue_(self, channel, rest):
         if self.player.hp <= 0:
-            await ctx.send("You are dead... Revive to adventure!")
+            await channel.send("You are dead... Revive to adventure!")
             return
 
         if self.type == BATTLE:
@@ -58,4 +59,4 @@ class Adventure:
                 self.running = False
                 self.type = None
             elif self.player.health <= 0:
-                await ctx.send("Lol...")
+                print(self.player, "died")

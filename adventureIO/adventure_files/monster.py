@@ -1,3 +1,12 @@
+import discord
+import yaml
+
+from adventureIO.constants import Emoji
+
+
+with open("resources/monsters.yml", encoding="UTF-8") as yml:
+    monsters = yaml.safe_load(yml)
+
 
 class Monster:
     def __init__(self, name, desc, hp, atk, res, crit, loot, max_hp=None, **x):
@@ -9,6 +18,25 @@ class Monster:
         self.resistance = res
         self.crit = crit
         self.loot_table = loot
+        self.thumbnail = monsters.get(self.name)["thumbnail"]
+
+    @property
+    def embed(self):
+        embed = discord.Embed(title=self.name)
+        embed.description = (
+            f"{self.description}\n"
+            " \n"
+            f"<{Emoji.health}> {self.max_hp}\n"
+            f"<{Emoji.attack}> {self.attack}\n"
+            f"<{Emoji.resistance}> {self.resistance}\n"
+            f"<{Emoji.crit}> {self.crit}\n"
+        )
+        embed.set_thumbnail(url=self.thumbnail)
+        embed.color = discord.Colour.red()
+        embed.set_footer(
+            text=f"Type .adventure 1 to fight or .adventure 2 to flee"
+        )
+        return embed
 
     @property
     def hp(self):
